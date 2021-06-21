@@ -103,11 +103,54 @@ describe("AdvertisementRepo", () => {
                 ad.targetCountry.should.be.equal("IE");
             });
         });
-        it("should return an empty array if no advertisements are found");
+        it("should return an empty array if no advertisements are found", () => {
+            const repo = new AdvertisementRepo(fakeClient);
+            sinon.stub(fakeCollection, 'find').callsFake((query: object) => {
+                return []
+            });
+
+            return repo.getByTargetCountry("IE").should.be.fulfilled().then((res: any[]) => {
+                const fn = fakeCollection.find as sinon.SinonSpy;
+                fn.called.should.be.true();
+                fn.calledWith({targetCountry: "IE"}).should.be.true();
+                res.length.should.be.equal(0);
+            });
+        });
     });
     describe("getByPartner", () => {
-        it("should fail if the database emits an error");
-        it("should retrieve all advertisements for the specified partner");
+        beforeEach(() => {
+            sinon.restore();
+        });
+        it("should fail if the database emits an error", () => {
+            const repo = new AdvertisementRepo(fakeClient);
+            repo.should.be.of.instanceOf(AdvertisementRepo);
+            sinon.stub(fakeClient, "connect").callsFake(() => {
+                throw new Error('ECONNREFUSED');
+            });
+            return repo.getByPartnerId(new ObjectID().toString()).should.be.rejectedWith(Error).then((err: any) => {
+                const fn = fakeClient.connect as sinon.SinonSpy;
+                fn.called.should.be.true();
+            });
+        });
+        it("should retrieve all advertisements for the specified partner", () => {
+            const repo = new AdvertisementRepo(fakeClient);
+            const obj_id = new ObjectID();
+            sinon.stub(fakeCollection, 'find').callsFake((query: object) => {
+                return [
+                    {_id:new ObjectID(), name: "yarr for all", tags: ['yarr', 'all'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: obj_id, clicks: 0, successful: 0, enabled: true, targetCountry:"IE"}
+                ]
+            });
+
+            repo.should.be.instanceOf(AdvertisementRepo);
+           
+            return repo.getByPartnerId(obj_id.toString()).should.be.fulfilled().then((res: any[]) => {
+                const fn = fakeCollection.find as sinon.SinonSpy;
+                fn.called.should.be.true();
+                fn.calledWith({partner: obj_id.toString()}).should.be.true();
+                res.length.should.equal(1);
+                res[0].should.be.instanceOf(Advertisement);
+            });
+        });
         it("should return an empty array if no advertisements are found");
     });
 });

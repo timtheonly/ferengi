@@ -15,10 +15,14 @@ export default class AdvertisementRepo {
         return this.query({targetCountry: targetCountry});
     }
 
+    public async getByPartnerId(partnerId: string): Promise<Advertisement[]>{
+        return this.query({partner: partnerId});
+    }
+
     private async query(queryParams: object): Promise<Advertisement[]>{
         await this.mongoClient.connect();
-        const collection: Collection = await this.mongoClient.db("ferengi").collection("advertisements");
-        let adsCursor: Cursor = await collection.find(queryParams);
+        const collection: Collection = this.mongoClient.db("ferengi").collection("advertisements");
+        let adsCursor: Cursor = collection.find(queryParams);
         let ads: Advertisement[]  = [];
         await adsCursor.forEach((doc) => {
             doc.partner = this.getPartner(doc.partner);
