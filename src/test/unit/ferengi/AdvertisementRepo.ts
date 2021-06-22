@@ -151,6 +151,21 @@ describe("AdvertisementRepo", () => {
                 res[0].should.be.instanceOf(Advertisement);
             });
         });
-        it("should return an empty array if no advertisements are found");
+        it("should return an empty array if no advertisements are found", () => {
+            const repo = new AdvertisementRepo(fakeClient);
+            const obj_id = new ObjectID();
+            sinon.stub(fakeCollection, 'find').callsFake((query: object) => {
+                return []
+            });
+
+            repo.should.be.instanceOf(AdvertisementRepo);
+
+            return repo.getByPartnerId(obj_id.toString()).should.be.fulfilled().then((res: any[]) => {
+                const fn = fakeCollection.find as sinon.SinonSpy;
+                fn.called.should.be.true();
+                fn.calledWith({partner: obj_id.toString()}).should.be.true();
+                res.length.should.equal(0);
+            });
+        });
     });
 });
