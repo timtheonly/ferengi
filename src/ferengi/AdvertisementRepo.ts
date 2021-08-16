@@ -19,23 +19,26 @@ export default class AdvertisementRepo {
         return this.query({partner: partnerId});
     }
 
+    public async getAll(): Promise<Advertisement[]>{
+        return this.query({});
+    }
+
     private async query(queryParams: object): Promise<Advertisement[]>{
         await this.mongoClient.connect();
         const collection: Collection = this.mongoClient.db("ferengi").collection("advertisements");
         let adsCursor: Cursor = collection.find(queryParams);
         let ads: Advertisement[]  = [];
-        await adsCursor.forEach((doc) => {
-            doc.partner = this.getPartner(doc.partner);
+        for await (const doc of adsCursor) {
+            doc.partner = await this.getPartner(new ObjectID(doc.partner));
             ads.push(new Advertisement(doc._id, doc.name, doc.tags, doc.dest_url, doc.image_url, doc.partner, doc.clicks, doc.successful, doc.enabled, doc.targetCountry));
-        });
-
+        }
         return ads;
     }
 
     private  async getPartner(partnerId: ObjectID): Promise<Partner>{
         await this.mongoClient.connect();
         const collection: Collection = await this.mongoClient.db("ferengi").collection("partners");
-        let raw_partner = await collection.findOne({_id: partnerId});
+        let raw_partner = await collection.findOne({_id: partnerId}).catch((error) => {console.log(error);});
         return new Partner(raw_partner._id, raw_partner.name);
     }
 }

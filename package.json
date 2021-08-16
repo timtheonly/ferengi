@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "test:unit": "mocha src/test/unit --recursive",
-    "start:app": "node -r ts-node/register src/index.ts"
+    "start:app": "node -r ts-node/register src/index.ts --trace-warnings",
+    "app": "node dist/src/index.js"
   },
   "author": "",
   "license": "ISC",

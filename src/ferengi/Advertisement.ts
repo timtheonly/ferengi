@@ -14,6 +14,4 @@ export default class Advertisement {
         public enabled: boolean,
         public targetCountry: string,
     ) {}
-
-
 }

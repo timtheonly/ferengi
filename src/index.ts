@@ -1,25 +1,19 @@
 import * as config from 'config'
 import * as express from 'express'
 import {bindRouteHandlers, createApplication} from "./ferengi/internals/startup";
-import {Router, RouteDefinition} from "./ferengi/internals/router";
-import AdvertisementRouter from "./ferengi/routers/advertisement";
-import StatusRouter from "./ferengi/routers/status";
+import { MongoClient } from 'mongodb';
+import StatusHandler from './ferengi/routers/status';
+import AdvertisementHandler from './ferengi/routers/advertisement';
 
 if(require.main == module) {
     main(process.argv);
 }
 
-function buildRouteHandlers(): Router[]{
-    let routers: Router[] = [];
-    routers.push(new StatusRouter());
-    routers.push(new AdvertisementRouter());
-    return routers;
-}
-
 export default function main(argv: string[]): Promise<void> {
-    let routers: Router[] = buildRouteHandlers();
+    const mongoConfig: any = config.get("mongo");
+    const mongo =  new MongoClient(mongoConfig['uri']);
     return createApplication()
-        .then(bindRouteHandlers(routers))
+        .then(bindRouteHandlers(new StatusHandler(), new AdvertisementHandler(mongo)))
         .then((app:express.Application) => {
             const port = config.get('serverPort');
             const server = app.listen(port);
