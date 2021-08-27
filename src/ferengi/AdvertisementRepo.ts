@@ -1,10 +1,12 @@
 import {Collection, Cursor, MongoClient, ObjectID} from "mongodb"
 import Partner from "./Partner";
 import Advertisement from "./Advertisement";
+import PartnerRepo from "./PartnerRepo";
 
 export default class AdvertisementRepo {
     public constructor(
-        private readonly mongoClient: MongoClient
+        private readonly mongoClient: MongoClient,
+        private readonly partnerRepo: PartnerRepo
     ) {}
 
     public async getByTag(tag: string): Promise<Advertisement[]>{
@@ -29,16 +31,9 @@ export default class AdvertisementRepo {
         let adsCursor: Cursor = collection.find(queryParams);
         let ads: Advertisement[]  = [];
         for await (const doc of adsCursor) {
-            doc.partner = await this.getPartner(new ObjectID(doc.partner));
+            doc.partner = await this.partnerRepo.get(new ObjectID(doc.partner));
             ads.push(new Advertisement(doc._id, doc.name, doc.tags, doc.dest_url, doc.image_url, doc.partner, doc.clicks, doc.successful, doc.enabled, doc.targetCountry));
         }
         return ads;
-    }
-
-    private  async getPartner(partnerId: ObjectID): Promise<Partner>{
-        await this.mongoClient.connect();
-        const collection: Collection = await this.mongoClient.db("ferengi").collection("partners");
-        let raw_partner = await collection.findOne({_id: partnerId}).catch((error) => {console.log(error);});
-        return new Partner(raw_partner._id, raw_partner.name);
     }
 }
