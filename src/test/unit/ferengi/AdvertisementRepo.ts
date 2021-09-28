@@ -18,12 +18,18 @@ describe("AdvertisementRepo", () => {
         find: (query: any) => {},findOne: (query: any) => {},
     } as any;
 
+    const fakePartnerRepo = {
+        get: (objectId: any) => {
+            return {_id: new ObjectID(), name:"airia"};
+        }
+    }
+
     describe("getByTag", () => {
         beforeEach(() => {
            sinon.restore();
         });
         it("should fail if the database emits an error", () => {
-            const repo = new AdvertisementRepo(fakeClient);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
             repo.should.be.of.instanceOf(AdvertisementRepo);
             sinon.stub(fakeClient, "connect").callsFake(() => {
                 throw new Error('ECONNREFUSED');
@@ -34,15 +40,12 @@ describe("AdvertisementRepo", () => {
             });
         });
         it("should retrieve all advertisements with the specified tag", () => {
-            const repo = new AdvertisementRepo(fakeClient);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
             sinon.stub(fakeCollection, 'find').callsFake((query: object)=>{
                 return [
                     {_id:new ObjectID(), name: "yarr beans", tags: ['yarr'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: new ObjectID(), clicks: 0, successful: 0, enabled: true, targetCountry:"IQ"},
                     {_id:new ObjectID(), name: "yarr for all", tags: ['yarr', 'all'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: new ObjectID(), clicks: 0, successful: 0, enabled: true, targetCountry:"IQ"}
                 ]
-            });
-            sinon.stub(fakeCollection, 'findOne').callsFake((query: object) => {
-                return {_id: new ObjectID(), name:"airia"};
             });
             return repo.getByTag("yarr").should.be.fulfilled().then((res: any[])=>{
                 const fn = fakeCollection.find as sinon.SinonSpy;
@@ -55,7 +58,7 @@ describe("AdvertisementRepo", () => {
             });
         });
         it("should return an empty array if no advertisements are found", () => {
-            const repo = new AdvertisementRepo(fakeClient);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
             sinon.stub(fakeCollection, 'find').callsFake((query: object)=>{
                 return []
             });
@@ -72,7 +75,7 @@ describe("AdvertisementRepo", () => {
             sinon.restore();
         });
         it("should fail if the database emits an error", () => {
-            const repo = new AdvertisementRepo(fakeClient);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
             repo.should.be.of.instanceOf(AdvertisementRepo);
             sinon.stub(fakeClient, "connect").callsFake(() => {
                 throw new Error('ECONNREFUSED');
@@ -83,15 +86,11 @@ describe("AdvertisementRepo", () => {
             });
         });
         it("should retrieve all advertisements with the specified country", () => {
-            const repo = new AdvertisementRepo(fakeClient);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
             sinon.stub(fakeCollection, 'find').callsFake((query: object)=>{
                 return [
                     {_id:new ObjectID(), name: "yarr for all", tags: ['yarr', 'all'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: new ObjectID(), clicks: 0, successful: 0, enabled: true, targetCountry:"IE"}
                 ]
-            });
-
-            sinon.stub(fakeCollection, 'findOne').callsFake((query: object) => {
-                return {_id: new ObjectID(), name:"airia"};
             });
 
             return repo.getByTargetCountry("IE").should.be.fulfilled().then((res: any[]) => {
@@ -104,7 +103,7 @@ describe("AdvertisementRepo", () => {
             });
         });
         it("should return an empty array if no advertisements are found", () => {
-            const repo = new AdvertisementRepo(fakeClient);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
             sinon.stub(fakeCollection, 'find').callsFake((query: object) => {
                 return []
             });
@@ -122,7 +121,7 @@ describe("AdvertisementRepo", () => {
             sinon.restore();
         });
         it("should fail if the database emits an error", () => {
-            const repo = new AdvertisementRepo(fakeClient);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
             repo.should.be.of.instanceOf(AdvertisementRepo);
             sinon.stub(fakeClient, "connect").callsFake(() => {
                 throw new Error('ECONNREFUSED');
@@ -133,16 +132,12 @@ describe("AdvertisementRepo", () => {
             });
         });
         it("should retrieve all advertisements for the specified partner", () => {
-            const repo = new AdvertisementRepo(fakeClient);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
             const obj_id = new ObjectID();
             sinon.stub(fakeCollection, 'find').callsFake((query: object) => {
                 return [
                     {_id:new ObjectID(), name: "yarr for all", tags: ['yarr', 'all'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: obj_id, clicks: 0, successful: 0, enabled: true, targetCountry:"IE"}
                 ]
-            });
-
-            sinon.stub(fakeCollection, 'findOne').callsFake((query: object) => {
-                return {_id: new ObjectID(), name:"airia"};
             });
 
             repo.should.be.instanceOf(AdvertisementRepo);
@@ -156,7 +151,7 @@ describe("AdvertisementRepo", () => {
             });
         });
         it("should return an empty array if no advertisements are found", () => {
-            const repo = new AdvertisementRepo(fakeClient);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
             const obj_id = new ObjectID();
             sinon.stub(fakeCollection, 'find').callsFake((query: object) => {
                 return []
