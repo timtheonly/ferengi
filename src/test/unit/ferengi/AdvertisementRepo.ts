@@ -141,6 +141,10 @@ describe("AdvertisementRepo", () => {
                 ]
             });
 
+            sinon.stub(fakeCollection, 'findOne').callsFake((query: object) => {
+                return {_id: new ObjectID(), name:"airia"};
+            });
+
             repo.should.be.instanceOf(AdvertisementRepo);
            
             return repo.getByPartnerId(obj_id.toString()).should.be.fulfilled().then((res: any[]) => {

@@ -38,7 +38,7 @@ export default class AdvertisementRepo {
     private  async getPartner(partnerId: ObjectID): Promise<Partner>{
         await this.mongoClient.connect();
         const collection: Collection = await this.mongoClient.db("ferengi").collection("partners");
-        let raw_partner = await collection.findOne({_id: partnerId}).catch((error) => {console.log(error);});
+        let raw_partner = await collection.findOne({_id: partnerId});
         return new Partner(raw_partner._id, raw_partner.name);
     }
 }
