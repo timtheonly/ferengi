@@ -1,6 +1,6 @@
 import "should"
 import * as sinon from "sinon";
-import AdvertisementRepo from "../../../ferengi/AdvertisementRepo";
+import AdvertisementRepo from "../../../ferengi/dataAccess/AdvertisementRepo";
 import {ObjectID} from "mongodb";
 import Advertisement from "../../../ferengi/Advertisement";
 

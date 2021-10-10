@@ -1,12 +1,16 @@
 import {Collection, Cursor, MongoClient, ObjectID} from "mongodb"
-import Partner from "./Partner";
-import Advertisement from "./Advertisement";
+import Partner from "../Partner";
+import Advertisement from "../Advertisement";
 import PartnerRepo from "./PartnerRepo";
+import Click from "../Click";
+import AdvertiserRepo from "./AdvertiserRepo";
+import Advertiser from "../Advertiser";
 
 export default class AdvertisementRepo {
     public constructor(
         private readonly mongoClient: MongoClient,
-        private readonly partnerRepo: PartnerRepo
+        private readonly partnerRepo: PartnerRepo,
+        private readonly advertiserRepo: AdvertiserRepo,
     ) {}
 
     public async getByTag(tag: string): Promise<Advertisement[]>{
@@ -25,6 +29,17 @@ export default class AdvertisementRepo {
         return this.query({});
     }
 
+    private async populateClicks(rawClicks: Array<any>): Promise<Array<Click>>{
+        const clicks: Array<Click> = [];
+        for await(const rawClick of rawClicks){
+            const advertiser: Advertiser | undefined = await this.advertiserRepo.get(new ObjectID(rawClick.advertiser));
+            if (advertiser !== undefined) {
+                clicks.push(new Click(advertiser, rawClick.count, rawClick.successful));
+            }
+        }
+        return clicks;
+    }
+
     private async query(queryParams: object): Promise<Advertisement[]>{
         await this.mongoClient.connect();
         const collection: Collection = this.mongoClient.db("ferengi").collection("advertisements");
@@ -32,7 +47,8 @@ export default class AdvertisementRepo {
         let ads: Advertisement[]  = [];
         for await (const doc of adsCursor) {
             doc.partner = await this.partnerRepo.get(new ObjectID(doc.partner));
-            ads.push(new Advertisement(doc._id, doc.name, doc.tags, doc.dest_url, doc.image_url, doc.partner, doc.clicks, doc.successful, doc.enabled, doc.targetCountry));
+            doc.clicks = await this.populateClicks(doc.clicks);
+            ads.push(new Advertisement(doc._id, doc.name, doc.tags, doc.dest_url, doc.image_url, doc.partner, doc.clicks, doc.enabled, doc.targetCountry));
         }
         return ads;
     }

@@ -1,5 +1,6 @@
 import {ObjectID} from "mongodb";
 import Partner from "./Partner";
+import Click from "./Click";
 
 export default class Advertisement {
     public constructor(
@@ -9,8 +10,7 @@ export default class Advertisement {
         public dest_url: string,
         public image_url: string,
         public partner: Partner,
-        public clicks: number,
-        public successful: number,
+        public clicks: Array<Click>,
         public enabled: boolean,
         public targetCountry: string,
     ) {}

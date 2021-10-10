@@ -1,7 +1,7 @@
 import { MongoClient } from "mongodb";
 import {Request, Response, NextFunction} from "express"
 import IHandler from "../internals/handler";
-import PartnerRepo from "../PartnerRepo";
+import PartnerRepo from "../dataAccess/PartnerRepo";
 
 export default class PartnerHandler implements IHandler {
     constructor(

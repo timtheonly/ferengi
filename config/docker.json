@@ -1,0 +1,5 @@
+{
+  "mongo": {
+    "uri": "mongodb://ferengi-mongo:27017"
+  }
+}

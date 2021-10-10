@@ -1,5 +1,5 @@
 import { Collection, Cursor, MongoClient, ObjectID } from "mongodb";
-import Partner from "./Partner";
+import Partner from "../Partner";
 
 export default class PartnerRepo{
     constructor(

@@ -1,12 +1,13 @@
 import IHandler from "../internals/handler";
 import {Request, Response, NextFunction} from "express"
-import AdvertisementRepo from "../AdvertisementRepo";
+import AdvertisementRepo from "../dataAccess/AdvertisementRepo";
 import { MongoClient } from "mongodb";
-import PartnerRepo from "../PartnerRepo";
+import PartnerRepo from "../dataAccess/PartnerRepo";
+import AdvertiserRepo from "../dataAccess/AdvertiserRepo";
 
 export default class AdvertisementHandler implements IHandler{
-    constructor(private mongo: MongoClient, private repo?: AdvertisementRepo) {
-        this.repo = new AdvertisementRepo(mongo, new PartnerRepo(mongo));
+    constructor(private mongo: MongoClient, private readonly repo?: AdvertisementRepo) {
+        this.repo = new AdvertisementRepo(mongo, new PartnerRepo(mongo), new AdvertiserRepo(mongo));
     }
 
     public get() {
