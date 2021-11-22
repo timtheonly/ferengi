@@ -1,0 +1,124 @@
+{
+  "info": {
+    "title": "ferengi",
+    "description": "the rules of acquisition",
+    "version": "0.0.1"
+  },
+  "paths": {
+    "/advertisement": {
+      "get": {
+        "summary": "Returns an Array of Advertisements",
+        "responses": {
+          "200": {
+            "description": "array of advertisements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdvertisementArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Advertisement": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "The advertisement id"
+          },
+          "name": {
+            "type": "string",
+            "description": "advertisement name"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "array of tags for advertisement"
+          },
+          "dest_url": {
+            "type": "string",
+            "description": "url to send the user to on click"
+          },
+          "image_url": {
+            "type": "string",
+            "description": "image url for advertisement, displayed to user"
+          },
+          "partner": {
+            "$ref": "#/components/schemas/Partner"
+          },
+          "clicks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Click"
+            }
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "is this advertisement enabled"
+          },
+          "targetCountry": {
+            "type": "string",
+            "description": "the target country for this advertisement"
+          }
+        }
+      },
+      "AdvertisementArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Advertisement"
+        }
+      },
+      "Partner": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "The partner id"
+          },
+          "name": {
+            "type": "string",
+            "description": "partner name"
+          }
+        }
+      },
+      "Click": {
+        "type": "object",
+        "properties": {
+          "advertiser": {
+            "$ref": "#/components/schemas/Advertiser"
+          },
+          "count": {
+            "type": "number",
+            "description": "the number of clicks registered for this advertiser"
+          },
+          "successful": {
+            "type": "number",
+            "description": "number of successful conversions attributed to this advertiser"
+          }
+        }
+      },
+      "Advertiser": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "The advertiser id"
+          },
+          "name": {
+            "type": "string",
+            "description": "advertiser name"
+          }
+        }
+      }
+    }
+  },
+  "openapi": "3.0.3"
+}

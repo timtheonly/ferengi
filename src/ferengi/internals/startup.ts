@@ -1,4 +1,6 @@
 import * as express from "express"
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require('../../../swagger.json');
 
 import AdvertisementHandler from "../routers/advertisement";
 import AdvertiserHandler from "../routers/advertiser";
@@ -16,5 +18,12 @@ export function bindRouteHandlers(status: StatusHandler, advertisements: Adverti
         app.get('/advertiser', advertiser.get());
         app.get('/partner', partners.get());
         return app;
+    }
+}
+
+export function bindSwagger() {
+    return async (app: express.Application): Promise<express.Application> => {
+        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+        return app
     }
 }

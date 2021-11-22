@@ -1,6 +1,6 @@
 import * as config from 'config'
 import * as express from 'express'
-import {bindRouteHandlers, createApplication} from "./ferengi/internals/startup";
+import {bindRouteHandlers, createApplication, bindSwagger} from "./ferengi/internals/startup";
 import { MongoClient } from 'mongodb';
 import StatusHandler from './ferengi/routers/status';
 import AdvertisementHandler from './ferengi/routers/advertisement';
@@ -16,6 +16,7 @@ export default function main(argv: string[]): Promise<void> {
     const mongo =  new MongoClient(mongoConfig['uri']);
     return createApplication()
         .then(bindRouteHandlers(new StatusHandler(), new AdvertisementHandler(mongo), new AdvertiserHandler(mongo), new PartnerHandler(mongo)))
+        .then(bindSwagger())
         .then((app:express.Application) => {
             const port = config.get('serverPort');
             const server = app.listen(port);
