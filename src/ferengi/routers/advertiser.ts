@@ -15,8 +15,8 @@ export default class AdvertiserHandler implements IHandler {
         return async (req: Request, res: Response, next: NextFunction) => {
             if(this.repo){
                 let results;
-                if(req.query.id){
-                    results = await this.repo.get(req.query.id as string);
+                if(req.params.id){
+                    results = await this.repo.get(req.params.id as string);
                 } else {
                     results = await this.repo.getAll();
                 }

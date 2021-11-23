@@ -15,7 +15,9 @@ export function bindRouteHandlers(status: StatusHandler, advertisements: Adverti
     return async (app: express.Application): Promise<express.Application> => {
         app.get('/status', status.get());
         app.get('/advertisement', advertisements.get());
+        app.get('/advertiser/:id', advertiser.get());
         app.get('/advertiser', advertiser.get());
+        app.get('/partner/:id', partners.get());
         app.get('/partner', partners.get());
         return app;
     }

@@ -24,7 +24,7 @@ export default class AdvertiserRepo {
     public async getAll(): Promise<Array<Advertiser>> {
         await this.mongoClient.connect();
         const collection: Collection = this.mongoClient.db("ferengi").collection("advertisers");
-        const advertisersCuror: Cursor = collection.find({});
+        const advertisersCuror: Cursor = await collection.find({});
         let advertisers: Advertiser[] = [];
         for await(const doc of advertisersCuror){
             advertisers.push(new Advertiser(doc._id, doc.name));

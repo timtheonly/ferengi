@@ -7,14 +7,142 @@
   "paths": {
     "/advertisement": {
       "get": {
-        "summary": "Returns an Array of Advertisements",
+        "summary": "Returns an Array of Advertisement",
+        "parameters": [
+          {
+            "name": "partner",
+            "in": "query",
+            "description": "get by partner id",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "description": "get by tag",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "targetCountry",
+            "in": "query",
+            "description": "get by target country",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
         "responses": {
           "200": {
             "description": "array of advertisements",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdvertisementArray"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Advertisement"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/advertiser": {
+      "get": {
+        "summary": "Returns an Array of Advertiser",
+        "responses": {
+          "200": {
+            "description": "array of advertiser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Advertiser"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/advertiser/{id}": {
+      "get": {
+        "summary": "Returns an Advertiser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "get by advertiser id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Advertiser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Advertiser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/partner": {
+      "get": {
+        "summary": "Returns an Array of Partner",
+        "responses": {
+          "200": {
+            "description": "array of partner",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Partner"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/partner/{id}": {
+      "get": {
+        "summary": "Returns an Partner",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "get by partner id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Partner",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Partner"
                 }
               }
             }
@@ -68,12 +196,6 @@
             "type": "string",
             "description": "the target country for this advertisement"
           }
-        }
-      },
-      "AdvertisementArray": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/Advertisement"
         }
       },
       "Partner": {
