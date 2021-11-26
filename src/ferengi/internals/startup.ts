@@ -14,6 +14,10 @@ export async function createApplication(): Promise<express.Application> {
 export function bindRouteHandlers(status: StatusHandler, advertisements: AdvertisementHandler, advertiser: AdvertiserHandler, partners: PartnerHandler) {
     return async (app: express.Application): Promise<express.Application> => {
         app.get('/status', status.get());
+        app.get('/advertisement/partner/:partner', advertisements.get());
+        app.get('/advertisement/tag/:tag', advertisements.get());
+        app.get('/advertisement/targetcountry/:targetCountry', advertisements.get());
+        app.get('/advertisement/:id', advertisements.get());
         app.get('/advertisement', advertisements.get());
         app.get('/advertiser/:id', advertiser.get());
         app.get('/advertiser', advertiser.get());

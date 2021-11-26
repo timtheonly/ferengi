@@ -1,32 +1,25 @@
 import {Collection, Cursor, MongoClient, ObjectID} from "mongodb";
 import Advertiser from "../Advertiser";
+import BaseRepo from "./BaseRepo";
 
-export default class AdvertiserRepo {
-    public constructor(
-        private readonly mongoClient: MongoClient
-    ){}
-
+export default class AdvertiserRepo extends BaseRepo{
+    constructor(mongoClient: MongoClient) {
+        super("advertisers", mongoClient);
+    }
     public async get(id: ObjectID | string): Promise<Advertiser| undefined> {
-        if(typeof id == "string"){
-            try {
-                id = new ObjectID(id);
-            } catch (e) {
-                console.log(e);
-                return;
-            }
-        }
+        id = this.parseId(id);
         await this.mongoClient.connect();
-        const collection: Collection = this.mongoClient.db("ferengi").collection("advertisers");
+        const collection: Collection = this.mongoClient.db(this.database).collection(this.collection);
         const advertiser =  await collection.findOne({_id: id});
         return new Advertiser(advertiser._id, advertiser.name);
     }
 
     public async getAll(): Promise<Array<Advertiser>> {
         await this.mongoClient.connect();
-        const collection: Collection = this.mongoClient.db("ferengi").collection("advertisers");
-        const advertisersCuror: Cursor = await collection.find({});
+        const collection: Collection = this.mongoClient.db(this.database).collection(this.collection);
+        const advertisersCursor: Cursor = await collection.find({});
         let advertisers: Advertiser[] = [];
-        for await(const doc of advertisersCuror){
+        for await(const doc of advertisersCursor){
             advertisers.push(new Advertiser(doc._id, doc.name));
         }
         return advertisers;

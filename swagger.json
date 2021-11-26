@@ -8,38 +8,130 @@
     "/advertisement": {
       "get": {
         "summary": "Returns an Array of Advertisement",
+        "responses": {
+          "200": {
+            "description": "array of advertisements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Advertisement"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/advertisement/{id}": {
+      "get": {
+        "summary": "Returns an Advertiser",
         "parameters": [
           {
-            "name": "partner",
-            "in": "query",
-            "description": "get by partner id",
+            "name": "id",
+            "in": "path",
+            "description": "get by advertisement id",
             "schema": {
               "type": "string"
             },
-            "required": false
-          },
-          {
-            "name": "tag",
-            "in": "query",
-            "description": "get by tag",
-            "schema": {
-              "type": "string"
-            },
-            "required": false
-          },
-          {
-            "name": "targetCountry",
-            "in": "query",
-            "description": "get by target country",
-            "schema": {
-              "type": "string"
-            },
-            "required": false
+            "required": true
           }
         ],
         "responses": {
           "200": {
-            "description": "array of advertisements",
+            "description": "Advertiser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Advertisement"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/advertisement/partner/{partner}": {
+      "get": {
+        "summary": "Returns Advertisers",
+        "parameters": [
+          {
+            "name": "partner",
+            "in": "path",
+            "description": "get by advertisements by partner id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Advertiser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Advertisement"
+                  }
+              }
+            }
+          }
+        }
+      }
+      }
+    },
+    "/advertisement/tag/{tag}": {
+      "get": {
+        "summary": "Returns Advertisers",
+        "parameters": [
+          {
+            "name": "tag",
+            "in": "path",
+            "description": "get by advertisements by tag",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Advertiser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Advertisement"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/advertisement/targetcountry/{targetCountry}": {
+      "get": {
+        "summary": "Returns Advertisers",
+        "parameters": [
+          {
+            "name": "targetCountry",
+            "in": "path",
+            "description": "get by advertisements by target country",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Advertiser",
             "content": {
               "application/json": {
                 "schema": {

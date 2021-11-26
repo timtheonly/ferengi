@@ -4,24 +4,27 @@ import AdvertisementRepo from "../dataAccess/AdvertisementRepo";
 import { MongoClient } from "mongodb";
 import PartnerRepo from "../dataAccess/PartnerRepo";
 import AdvertiserRepo from "../dataAccess/AdvertiserRepo";
+import BaseApiHandler from "../internals/BaseApi";
 
-export default class AdvertisementHandler implements IHandler{
-    constructor(private mongo: MongoClient, private readonly repo?: AdvertisementRepo) {
-        this.repo = new AdvertisementRepo(mongo, new PartnerRepo(mongo), new AdvertiserRepo(mongo));
+export default class AdvertisementHandler extends BaseApiHandler{
+    constructor(
+        protected repo : AdvertisementRepo,
+    ) {
+        super(repo);
     }
-
     public get() {
         return async (req: Request, res: Response, next: NextFunction) => {
             if(this.repo){
                 let result;
-                if (req.query.partner) {
-                    result = await this.repo.getByPartnerId(req.query.partner as string);
-                } else if (req.query.tag) {
-                    result = await this.repo.getByTag(req.query.tag as string);
-                } else if (req.query.targetCountry) {
-                    result = await this.repo.getByTargetCountry(req.query.targetCountry as string);
-                }
-                else {
+                if (req.params.partner) {
+                    result = await this.repo.getByPartnerId(req.params.partner as string);
+                } else if (req.params.tag) {
+                    result = await this.repo.getByTag(req.params.tag as string);
+                } else if (req.params.targetCountry) {
+                    result = await this.repo.getByTargetCountry(req.params.targetCountry as string);
+                } else if (req.params.id) {
+                    result = await this.repo.get(req.params.id);
+                } else {
                     result = await this.repo.getAll();
                 }
                 return res.json(result);

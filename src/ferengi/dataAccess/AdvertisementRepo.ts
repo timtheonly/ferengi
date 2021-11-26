@@ -5,13 +5,26 @@ import PartnerRepo from "./PartnerRepo";
 import Click from "../Click";
 import AdvertiserRepo from "./AdvertiserRepo";
 import Advertiser from "../Advertiser";
+import BaseRepo from "./BaseRepo";
 
-export default class AdvertisementRepo {
+export default class AdvertisementRepo extends BaseRepo{
     public constructor(
-        private readonly mongoClient: MongoClient,
+        protected readonly mongoClient: MongoClient,
         private readonly partnerRepo: PartnerRepo,
         private readonly advertiserRepo: AdvertiserRepo,
-    ) {}
+    ) {
+        super("advertisements", mongoClient);
+    }
+
+    public async get(id: ObjectID | string): Promise<Partner|object>{
+        id = this.parseId(id);
+        await this.mongoClient.connect();
+        const collection: Collection = this.mongoClient.db(this.database).collection(this.collection);
+        let doc = await collection.findOne({_id: id}).catch((error: any) => {console.log(error);});
+        doc.partner = await this.partnerRepo.get(new ObjectID(doc.partner));
+        doc.clicks = await this.populateClicks(doc.clicks);
+        return new Advertisement(doc._id, doc.name, doc.tags, doc.dest_url, doc.image_url, doc.partner, doc.clicks, doc.enabled, doc.targetCountry);
+    }
 
     public async getByTag(tag: string): Promise<Advertisement[]>{
         return this.query({tags:tag});
@@ -42,7 +55,7 @@ export default class AdvertisementRepo {
 
     private async query(queryParams: object): Promise<Advertisement[]>{
         await this.mongoClient.connect();
-        const collection: Collection = this.mongoClient.db("ferengi").collection("advertisements");
+        const collection: Collection = this.mongoClient.db(this.database).collection(this.collection);
         let adsCursor: Cursor = collection.find(queryParams);
         let ads: Advertisement[]  = [];
         for await (const doc of adsCursor) {
