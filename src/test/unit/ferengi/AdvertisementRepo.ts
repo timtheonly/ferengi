@@ -1,8 +1,10 @@
 import "should"
 import * as sinon from "sinon";
-import AdvertisementRepo from "../../../ferengi/dataAccess/AdvertisementRepo";
-import {ObjectID} from "mongodb";
+import AdvertisementRepo from "../../../ferengi/dataAccess/AdvertisementRepo"
+import {ObjectId} from "mongodb";
 import Advertisement from "../../../ferengi/Advertisement";
+import Advertiser from "../../../ferengi/Advertiser";
+import Partner from "../../../ferengi/Partner";
 
 describe("AdvertisementRepo", () => {
     const fakeClient = {
@@ -20,7 +22,17 @@ describe("AdvertisementRepo", () => {
 
     const fakePartnerRepo = {
         get: (objectId: any) => {
-            return {_id: new ObjectID(), name:"airia"};
+            return new Promise<Partner>((resolve, reject) => {
+                resolve(new Partner(new ObjectId(), "airia"));
+            });
+        }
+    }
+
+    const fakeAdvertiserRepo = {
+        get:  (objectId: any) => {
+            return new Promise<Advertiser>((resolve, reject) => {
+                resolve(new Advertiser(new ObjectId(), "adverts"));
+            });
         }
     }
 
@@ -29,7 +41,7 @@ describe("AdvertisementRepo", () => {
            sinon.restore();
         });
         it("should fail if the database emits an error", () => {
-            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any, fakeAdvertiserRepo as any);
             repo.should.be.of.instanceOf(AdvertisementRepo);
             sinon.stub(fakeClient, "connect").callsFake(() => {
                 throw new Error('ECONNREFUSED');
@@ -40,11 +52,11 @@ describe("AdvertisementRepo", () => {
             });
         });
         it("should retrieve all advertisements with the specified tag", () => {
-            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any, fakeAdvertiserRepo as any);
             sinon.stub(fakeCollection, 'find').callsFake((query: object)=>{
                 return [
-                    {_id:new ObjectID(), name: "yarr beans", tags: ['yarr'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: new ObjectID(), clicks: 0, successful: 0, enabled: true, targetCountry:"IQ"},
-                    {_id:new ObjectID(), name: "yarr for all", tags: ['yarr', 'all'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: new ObjectID(), clicks: 0, successful: 0, enabled: true, targetCountry:"IQ"}
+                    {_id:new ObjectId(), name: "yarr beans", tags: ['yarr'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: new ObjectId(),  clicks: [{ advertiser: new ObjectId(), count: 0, successful: 0}], successful: 0, enabled: true, targetCountry:"IQ"},
+                    {_id:new ObjectId(), name: "yarr for all", tags: ['yarr', 'all'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: new ObjectId(),  clicks: [{ advertiser: new ObjectId(), count: 0, successful: 0}], successful: 0, enabled: true, targetCountry:"IQ"}
                 ]
             });
             return repo.getByTag("yarr").should.be.fulfilled().then((res: any[])=>{
@@ -58,7 +70,7 @@ describe("AdvertisementRepo", () => {
             });
         });
         it("should return an empty array if no advertisements are found", () => {
-            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any, fakeAdvertiserRepo as any);
             sinon.stub(fakeCollection, 'find').callsFake((query: object)=>{
                 return []
             });
@@ -75,7 +87,7 @@ describe("AdvertisementRepo", () => {
             sinon.restore();
         });
         it("should fail if the database emits an error", () => {
-            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any, fakeAdvertiserRepo as any);
             repo.should.be.of.instanceOf(AdvertisementRepo);
             sinon.stub(fakeClient, "connect").callsFake(() => {
                 throw new Error('ECONNREFUSED');
@@ -86,10 +98,10 @@ describe("AdvertisementRepo", () => {
             });
         });
         it("should retrieve all advertisements with the specified country", () => {
-            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any, fakeAdvertiserRepo as any);
             sinon.stub(fakeCollection, 'find').callsFake((query: object)=>{
                 return [
-                    {_id:new ObjectID(), name: "yarr for all", tags: ['yarr', 'all'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: new ObjectID(), clicks: 0, successful: 0, enabled: true, targetCountry:"IE"}
+                    {_id:new ObjectId(), name: "yarr for all", tags: ['yarr', 'all'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: new ObjectId(), clicks: [{ advertiser: new ObjectId(), count: 0, successful: 0}], enabled: true, targetCountry:"IE"}
                 ]
             });
 
@@ -103,7 +115,7 @@ describe("AdvertisementRepo", () => {
             });
         });
         it("should return an empty array if no advertisements are found", () => {
-            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any, fakeAdvertiserRepo as any);
             sinon.stub(fakeCollection, 'find').callsFake((query: object) => {
                 return []
             });
@@ -121,22 +133,22 @@ describe("AdvertisementRepo", () => {
             sinon.restore();
         });
         it("should fail if the database emits an error", () => {
-            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any, fakeAdvertiserRepo as any);
             repo.should.be.of.instanceOf(AdvertisementRepo);
             sinon.stub(fakeClient, "connect").callsFake(() => {
                 throw new Error('ECONNREFUSED');
             });
-            return repo.getByPartnerId(new ObjectID().toString()).should.be.rejectedWith(Error).then((err: any) => {
+            return repo.getByPartnerId(new ObjectId().toString()).should.be.rejectedWith(Error).then((err: any) => {
                 const fn = fakeClient.connect as sinon.SinonSpy;
                 fn.called.should.be.true();
             });
         });
         it("should retrieve all advertisements for the specified partner", () => {
-            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
-            const obj_id = new ObjectID();
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any, fakeAdvertiserRepo as any);
+            const obj_id = new ObjectId();
             sinon.stub(fakeCollection, 'find').callsFake((query: object) => {
                 return [
-                    {_id:new ObjectID(), name: "yarr for all", tags: ['yarr', 'all'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: obj_id, clicks: 0, successful: 0, enabled: true, targetCountry:"IE"}
+                    {_id:new ObjectId(), name: "yarr for all", tags: ['yarr', 'all'], dest_url:'http://someurl.com', image_url:'http://someurl.com/images/dope.png', partner: obj_id,  clicks: [{ advertiser: new ObjectId(), count: 0, successful: 0}], successful: 0, enabled: true, targetCountry:"IE"}
                 ]
             });
 
@@ -151,8 +163,8 @@ describe("AdvertisementRepo", () => {
             });
         });
         it("should return an empty array if no advertisements are found", () => {
-            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any);
-            const obj_id = new ObjectID();
+            const repo = new AdvertisementRepo(fakeClient, fakePartnerRepo as any, fakeAdvertiserRepo as any);
+            const obj_id = new ObjectId();
             sinon.stub(fakeCollection, 'find').callsFake((query: object) => {
                 return []
             });
