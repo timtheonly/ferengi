@@ -1,3 +1,5 @@
 {
-  "extends": "@istanbuljs/nyc-config-typescript"
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "include": "src/ferengi/",
+  "exclude": "src/test/**"
 }
