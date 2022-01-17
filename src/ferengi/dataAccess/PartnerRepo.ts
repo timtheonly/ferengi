@@ -10,7 +10,7 @@ export default class PartnerRepo extends BaseRepo{
         id = this.parseId(id);
         await this.mongoClient.connect();
         const collection: Collection = this.mongoClient.db(this.database).collection(this.collection);
-        let raw_partner = await collection.findOne({_id: id}).catch((error: any) => {console.log(error);});
+        let raw_partner = await collection.findOne({_id: id});
         return new Partner(raw_partner._id, raw_partner.name);
     }
 
