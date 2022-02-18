@@ -1,6 +1,7 @@
 import IHandler from "./handler";
 import BaseRepo from "../dataAccess/BaseRepo";
 import {NextFunction, Request, Response} from "express";
+import { BuildArgs } from "../../../types/buildArgs";
 
 export default class BaseApiHandler implements IHandler{
     constructor(
@@ -19,6 +20,15 @@ export default class BaseApiHandler implements IHandler{
                 return res.json(results);
             }
             return res.status(500).json({});
+        }
+    }
+
+    public post(){
+        return async (req: Request, res: Response, next: NextFunction) => {
+            if(this.repo) {
+                const result = await this.repo.create({name: req.query.name} as BuildArgs);
+                return res.json(result);
+            }
         }
     }
 }

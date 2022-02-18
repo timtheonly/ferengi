@@ -164,6 +164,31 @@
             }
           }
         }
+      },
+      "post": {
+        "summary": "Creates an Advertiser",
+        "parameters":[
+          {
+            "name": "name",
+            "in": "query",
+            "schema" :{
+              "type":"string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Advertiser",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Advertiser"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/advertiser/{id}": {
@@ -207,6 +232,31 @@
                   "items": {
                     "$ref": "#/components/schemas/Partner"
                   }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates a Partner",
+        "parameters":[
+          {
+            "name": "name",
+            "in": "query",
+            "schema" :{
+              "type":"string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Partner",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Partner"
                 }
               }
             }

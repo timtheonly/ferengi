@@ -1,4 +1,5 @@
 import {MongoClient, ObjectID} from "mongodb";
+import { BuildArgs } from "../../../types/buildArgs";
 
 export default class BaseRepo {
     protected readonly database: string = "ferengi";
@@ -21,6 +22,7 @@ export default class BaseRepo {
         return id
     }
 
+    public async create(buildArgs: BuildArgs): Promise<any> {}
     public async get(id: string | ObjectID): Promise<any> {}
     public async getAll(): Promise<any> {}
 }

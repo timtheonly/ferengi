@@ -21,8 +21,10 @@ export function bindRouteHandlers(status: StatusHandler, advertisements: Adverti
         app.get('/advertisement', advertisements.get());
         app.get('/advertiser/:id', advertiser.get());
         app.get('/advertiser', advertiser.get());
+        app.post('/advertiser', advertiser.post());
         app.get('/partner/:id', partners.get());
         app.get('/partner', partners.get());
+        app.post('/partner', partners.post());
         return app;
     }
 }
